@@ -37,9 +37,9 @@ INSERT INTO nocompress VALUES
 ]
 ');
 SELECT zson_learn('{{"nocompress", "x"}}');
-                                  zson_learn                                   
--------------------------------------------------------------------------------
- Done! Run " select * from zson_dict where dict_id = 0; " to see a dictionary.
+                                      zson_learn                                      
+--------------------------------------------------------------------------------------
+ Done! Run " select * from public.zson_dict where dict_id = 0; " to see a dictionary.
 (1 row)
 
 SELECT dict_id, word FROM zson_dict ORDER BY dict_id, word COLLATE "C";
@@ -53,9 +53,9 @@ SELECT dict_id, word FROM zson_dict ORDER BY dict_id, word COLLATE "C";
 (5 rows)
 
 SELECT zson_learn('{{"nocompress", "x"}}', 10000, 1, 128, 1);
-                                  zson_learn                                   
--------------------------------------------------------------------------------
- Done! Run " select * from zson_dict where dict_id = 1; " to see a dictionary.
+                                      zson_learn                                      
+--------------------------------------------------------------------------------------
+ Done! Run " select * from public.zson_dict where dict_id = 1; " to see a dictionary.
 (1 row)
 
 SELECT dict_id, word FROM zson_dict ORDER BY dict_id, word COLLATE "C";
