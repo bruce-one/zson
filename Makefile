@@ -1,6 +1,6 @@
 EXTENSION = zson
 MODULES = zson
-DATA = zson--1.1.sql zson--1.0--1.1.sql
+DATA = zson--1.2.sql zson--1.1--1.2.sql zson--1.0--1.1.sql
 REGRESS = zson
 
 PG_CPPFLAGS = -g -O2
