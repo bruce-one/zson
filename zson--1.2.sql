@@ -58,7 +58,7 @@ BEGIN
         END IF;
 
         query := query || '( select unnest(zson_extract_strings(' ||
-                    quote_ident(colname) || ')) as t from ' || tabname || ' tablesample system( LEAST((1000 * 100)::decimal / coalesce(nullif((select reltuples::bigint from pg_catalog.pg_class where relname=' || quote_literal(tabname) || '), 0), 1000) ), 100) order by random() limit ' ||
+                    quote_ident(colname) || ')) as t from ' || tabname || ' tablesample system( least((1000 * 100)::decimal / coalesce(nullif((select reltuples::bigint from pg_catalog.pg_class where relname=' || quote_literal(tabname) || '), 0), 1000), 100) ) order by random() limit ' ||
                     max_examples || ')';
 
     END LOOP;
