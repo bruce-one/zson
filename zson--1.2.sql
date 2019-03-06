@@ -3,17 +3,18 @@
 
 CREATE TYPE zson;
 
-CREATE TABLE zson_dict (
+CREATE TABLE @extschema@.zson_dict (
     dict_id SERIAL NOT NULL,
     word_id INTEGER NOT NULL,
     word text NOT NULL,
     PRIMARY KEY(dict_id, word_id)
 );
 
-SELECT pg_catalog.pg_extension_config_dump('zson_dict', '');
+SELECT pg_catalog.pg_extension_config_dump('@extschema@.zson_dict', '');
+SELECT pg_catalog.pg_extension_config_dump('@extschema@.zson_dict_dict_id_seq', '');
 
 -- Usage: select zson_learn('{{"table1", "col1"}, {"table2", "col2"}, ... }');
-CREATE FUNCTION zson_learn(
+CREATE FUNCTION @extschema@.zson_learn(
     tables_and_columns text[][],
     max_examples int default 10000,
     min_length int default 2,
@@ -62,25 +63,25 @@ BEGIN
 
     END LOOP;
 
-    select coalesce(max(dict_id), -1) + 1 INTO next_dict_id from zson_dict;
+    select coalesce(max(dict_id), -1) + 1 INTO next_dict_id from @extschema@.zson_dict;
 
     query := 'select t from (select t, count(*) as sum from ( ' ||
         query || ' ) as tt group by t) as s where length(t) >= ' ||
         min_length || ' and length(t) <= ' || max_length ||
         ' and sum >= ' || min_count || ' order by sum desc limit 65534';
 
-    query := 'insert into zson_dict select ' || next_dict_id ||
+    query := 'insert into @extschema@.zson_dict select ' || next_dict_id ||
         ' as dict_id, row_number() over () as word_id, t as word from ( ' ||
         query || ' ) as top_words';
 
     EXECUTE query;
 
-    RETURN 'Done! Run " select * from zson_dict where dict_id = ' ||
+    RETURN 'Done! Run " select * from @extschema@.zson_dict where dict_id = ' ||
         next_dict_id || '; " to see a dictionary.';
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE FUNCTION zson_extract_strings(x jsonb)
+CREATE FUNCTION @extschema@.zson_extract_strings(x jsonb)
     RETURNS text[] AS $$
 DECLARE
     jtype text;
@@ -107,37 +108,37 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE FUNCTION zson_in(cstring)
+CREATE FUNCTION @extschema@.zson_in(cstring)
     RETURNS zson
     AS 'MODULE_PATHNAME'
     LANGUAGE C STRICT IMMUTABLE;
 
-CREATE FUNCTION zson_out(zson)
+CREATE FUNCTION @extschema@.zson_out(zson)
     RETURNS cstring
     AS 'MODULE_PATHNAME'
     LANGUAGE C STRICT IMMUTABLE;
 
-CREATE TYPE zson (
+CREATE TYPE @extschema@.zson (
     INTERNALLENGTH = -1,
     INPUT = zson_in,
     OUTPUT = zson_out,
     STORAGE = extended -- try to compress
 );
 
-CREATE FUNCTION jsonb_to_zson(jsonb)
+CREATE FUNCTION @extschema@.jsonb_to_zson(jsonb)
     RETURNS zson
     AS 'MODULE_PATHNAME'
     LANGUAGE C STRICT IMMUTABLE;
 
-CREATE FUNCTION zson_to_jsonb(zson)
+CREATE FUNCTION @extschema@.zson_to_jsonb(zson)
     RETURNS jsonb
     AS 'MODULE_PATHNAME'
     LANGUAGE C STRICT IMMUTABLE;
 
-CREATE CAST (jsonb AS zson) WITH FUNCTION jsonb_to_zson(jsonb) AS ASSIGNMENT;
-CREATE CAST (zson AS jsonb) WITH FUNCTION zson_to_jsonb(zson) AS IMPLICIT;
+CREATE CAST (jsonb AS zson) WITH FUNCTION @extschema@.jsonb_to_zson(jsonb) AS ASSIGNMENT;
+CREATE CAST (zson AS jsonb) WITH FUNCTION @extschema@.zson_to_jsonb(zson) AS IMPLICIT;
 
-CREATE FUNCTION zson_info(zson)
+CREATE FUNCTION @extschema@.zson_info(zson)
     RETURNS cstring
     AS 'MODULE_PATHNAME'
     LANGUAGE C STRICT IMMUTABLE;
